@@ -27,8 +27,9 @@ class Cal
     raise ArgumentError, "#{year} is not a valid year." unless (1800..3000).include?(@year)
   end # initialize method
 
-  def month_header
-    header = "#{@month} #{@year}"
+  def month_header month, year = nil
+    header = "#{month} #{year}"
+    header = "#{month}" if year.nil?
     leading_spaces = ((20 - header.length) / 2).floor
     leading_spaces.times { header.prepend(" ") }
     trailing_spaces = 20 - header.length
@@ -40,27 +41,61 @@ class Cal
     "Su Mo Tu We Th Fr Sa"
   end # day_header method
 
-  def get_first_day
+  def get_first_day month, year
+    # The day indexing used in Zeller's Congruence starts on Saturday rather than Sunday.
     formula_days = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
     formula_months = ["March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "January", "February"]
-    m = formula_months.index(@month) + 3
-    y = @year
+    m = formula_months.index(month) + 3
+    y = year
     y -= 1 if m > 12
-    index = (1 + (((m + 1) * 26) / 10).floor + y + (y / 4).floor + (6 * (y / 100).floor) + (y / 400).floor) % 7
-    formula_days[index]
+    day_index = (1 + (((m + 1) * 26) / 10).floor + y + (y / 4).floor + (6 * (y / 100).floor) + (y / 400).floor) % 7
+    formula_days[day_index]
   end # get_first_day_index method
 
-  def format_weeks
+  def get_first_day_index month, year
+    possible_days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    first_day = get_first_day(month, year)
+    first_day_index = possible_days.index(first_day)
+    first_day_index
+  end # get_first_day_index method
 
-    # days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-    # first_day = get_first_day
-    # index = days.index(first_day)
-    # number_of_days = 31
-    # number_of_days = 30 if ["April", "June", "September", "November"].include?(@month)
-    # number_of_days = 28 if @month == "February"
-    # index
+  def get_month_days month, year
+    month_days = 31
+    month_days = 30 if ["April", "June", "September", "November"].include?(month)
+    if month == "February"
+      month_days = year % 4 == 0 ? 29 : 28
+      month_days = 28 if year % 100 == 0 && year % 400 != 0
+    end
+    month_days
+  end # get_month_days method
 
-  end
+  def format_week week, month, year
+    # Week arguments are zero indexing.
+    month_days = get_month_days(month, year)
+    first_day_index = get_first_day_index(month, year)
+    first_week_days = 7 - first_day_index
+    formatted_week = ""
+    if week == 0
+      first_day_index.times { formatted_week += "   " }
+      (1..first_week_days).each do | date |
+        formatted_week += " #{date}"
+        formatted_week += " " unless date == first_week_days
+      end
+    else
+      first_date = first_week_days + 1 + ((week - 1) * 7)
+      last_date = first_date + 6 < month_days ? first_date + 6 : month_days 
+      (first_date..last_date).each do | date|
+        formatted_week += " " if date < 10
+        formatted_week += "#{date}"
+        formatted_week += " " unless date == last_date
+      end
+      if formatted_week.length < 20
+        trailing_spaces = 20 - formatted_week.length
+        trailing_spaces.times { formatted_week += " " }
+      end
+    end
+    formatted_week
+  end # format_week method
 
   # def print_cal
   #   puts "#{@month} #{@year}"
