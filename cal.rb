@@ -1,25 +1,24 @@
-month_arg = ARGV[0]
-year_arg = ARGV[1]
-
 class Cal
   attr_reader :month
   attr_reader :year
 
   def initialize month = nil, year = nil
     possible_months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    numerical_month = month.to_i
+    numerical_year = year.to_i
     if month && year
-      if month.class == Fixnum
-        @month = possible_months[month - 1] if (1..12).include?(month)
-      elsif month.class == String
+      if numerical_month == 0
         possible_months.each do | current_month |
           @month = current_month if current_month.downcase[month.downcase]
         end
+      else
+        @month = possible_months[numerical_month - 1] if (1..12).include?(numerical_month)
       end
       raise ArgumentError, "#{month} is not a valid month." if @month.nil?
-      @year = year
+      @year = numerical_year
     elsif month && year.nil?
       @month = "all"
-      @year = month
+      @year = numerical_month
     else
       @month = "April"
       @year = 2013
@@ -27,19 +26,17 @@ class Cal
     raise ArgumentError, "#{year} is not a valid year." unless (1800..3000).include?(@year)
   end # initialize method
 
-  def month_header month, year = nil
+  def get_month_header month, year = nil
     header = "#{month} #{year}"
     header = "#{month}" if year.nil?
     leading_spaces = ((20 - header.length) / 2).floor
     leading_spaces.times { header.prepend(" ") }
-    trailing_spaces = 20 - header.length
-    trailing_spaces.times { header += " " }
     header
   end #  month_head method
 
-  def day_header
+  def get_day_header
     "Su Mo Tu We Th Fr Sa"
-  end # day_header method
+  end # get_day_header method
 
   def get_first_day month, year
     # The day indexing used in Zeller's Congruence starts on Saturday rather than Sunday.
@@ -77,33 +74,49 @@ class Cal
     formatted_week = ""
     if week == 0
       first_day_index.times { formatted_week += "   " }
-      (1..first_week_days).each do | date |
-        formatted_week += " #{date}"
-        formatted_week += " " unless date == first_week_days
-      end
+      first_date = 1
+      last_date = first_week_days
     else
       first_date = first_week_days + 1 + ((week - 1) * 7)
-      last_date = first_date + 6 < month_days ? first_date + 6 : month_days 
-      (first_date..last_date).each do | date|
-        formatted_week += " " if date < 10
-        formatted_week += "#{date}"
-        formatted_week += " " unless date == last_date
-      end
-      if formatted_week.length < 20
-        trailing_spaces = 20 - formatted_week.length
-        trailing_spaces.times { formatted_week += " " }
-      end
+      last_date = first_date + 6 < month_days ? first_date + 6 : month_days
+    end
+    # A downward range results in an empty string.
+    (first_date..last_date).each do | date|
+      formatted_week += " " if date < 10
+      formatted_week += "#{date}"
+      formatted_week += " " unless date == last_date
     end
     formatted_week
   end # format_week method
 
-  # def print_cal
-  #   puts "#{@month} #{@year}"
-  # end
+  def format_month month, year
+    month_header = get_month_header(month, year)
+    day_header = get_day_header
+    formatted_month = "#{month_header}\n#{day_header}\n"
+    (0..5).each do | week |
+      formatted_week = format_week(week, month, year)
+      formatted_month += formatted_week + "\n"
+    end
+    formatted_month
+  end # format_month method
+
+  def format_year year
+  end # format_year method
+
+  def render
+    if month != "all"
+      cal = format_month(@month, @year)
+    else
+      # cal = format_year
+    end
+    puts cal
+  end # print_cal method
 
 end # Cal class
 
-# cal = Cal.new(month_arg, year_arg)
-# cal.print_cal
-
-# print `cal #{month_arg} #{year_arg}`
+if __FILE__ == $0
+  cmd_month = ARGV[0]
+  cmd_year = ARGV[1]
+  cal = Cal.new(cmd_month, cmd_year)
+  cal.render
+end

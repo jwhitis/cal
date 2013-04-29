@@ -5,7 +5,7 @@ class CalUnitTest < Test::Unit::TestCase
 
   def test_11_creates_a_new_instance_of_cal
     cal = Cal.new("April", 1865)
-    assert (cal)
+    assert(cal)
   end
 
   def test_12_new_instance_stores_month_and_year_values
@@ -63,21 +63,21 @@ class CalUnitTest < Test::Unit::TestCase
     end
   end
 
-  def test_21_month_header_returns_indented_month_and_year
+  def test_21_get_month_header_returns_indented_month_and_year
     even_spaces = Cal.new("May", 1966)
     odd_spaces = Cal.new("November", 1938)
-    assert_equal("      May 1966      ", even_spaces.month_header("May", 1966))
-    assert_equal("   November 1938    ", odd_spaces.month_header("November", 1938))
+    assert_equal("      May 1966", even_spaces.get_month_header("May", 1966))
+    assert_equal("   November 1938", odd_spaces.get_month_header("November", 1938))
   end
 
-  def test_22_month_header_returns_indented_month_only
+  def test_22_get_month_header_returns_indented_month_only
     even_spaces = Cal.new(1804)
-    assert_equal("       March        ", even_spaces.month_header("March"))
+    assert_equal("       March", even_spaces.get_month_header("March"))
   end
 
-  def test_23_day_header_returns_days_of_week
+  def test_23_get_day_header_returns_days_of_week
     cal = Cal.new("June", 1844)
-    assert_equal("Su Mo Tu We Th Fr Sa", cal.day_header)
+    assert_equal("Su Mo Tu We Th Fr Sa", cal.get_day_header)
   end
 
   def test_24_get_first_day_returns_first_day_of_month
@@ -111,7 +111,13 @@ class CalUnitTest < Test::Unit::TestCase
     assert_equal(" 6  7  8  9 10 11 12", cal.format_week(1, "April", 2003))
     assert_equal("13 14 15 16 17 18 19", cal.format_week(2, "April", 2003))
     assert_equal("20 21 22 23 24 25 26", cal.format_week(3, "April", 2003))
-    assert_equal("27 28 29 30         ", cal.format_week(4, "April", 2003))
+    assert_equal("27 28 29 30", cal.format_week(4, "April", 2003))
+    assert_equal("", cal.format_week(5, "April", 2003))
+  end
+
+  def test_28_format_month_returns_formatted_month
+    cal = Cal.new("August", 1979)
+    assert_equal(`cal August 1979`, cal.format_month("August", 1979))
   end
 
 end
