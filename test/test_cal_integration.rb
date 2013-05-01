@@ -19,28 +19,37 @@ class CalIntegrationTest < Test::Unit::TestCase
     assert_equal(`cal`, `ruby cal.rb`)
   end
 
-  # def test_5_returns_full_year_if_given_year_but_no_month
-  #   assert_equal(`cal 1999`, `ruby cal.rb 1999`)
-  # end
+  def test_5_returns_full_year_if_given_year_but_no_month
+    assert_equal(`cal 1999`, `ruby cal.rb 1999`)
+  end
 
-  # def test_6_raises_error_if_given_month_but_no_year
-  #   assert_equal(`cal June`, `ruby cal.rb June`)
-  # end
+  def test_6_raises_error_if_given_month_but_no_year
+    assert_equal(`cal June`, `ruby cal.rb June`)
+  end
 
-  def test_7_accepts_numbers_and_names_as_month_arguments
+  def test_7_returns_cal_even_if_given_too_many_arguments
+    assert_equal(`cal August 2005`, `ruby cal.rb August 2005 1825`)
+  end
+
+  def test_8_accepts_numbers_and_names_as_month_arguments
     assert_equal(`cal August 1970`, `ruby cal.rb August 1970`)
     assert_equal(`cal 8 1970`, `ruby cal.rb 8 1970`)
   end
 
-  def test_8_every_fourth_year_is_a_leap_year
+  def test_9_accepts_numerical_arguments_with_leading_zeros
+    assert_equal(`cal 09 2192`, `ruby cal.rb 09 2192`)
+    assert_equal(`cal 5 01808`, `ruby cal.rb 5 01808`)
+  end
+
+  def test_10_every_fourth_year_is_a_leap_year
     assert_equal(`cal 10 2012`, `ruby cal.rb 10 2012`)
   end
 
-  def test_9_most_multiples_of_100_are_common_years
+  def test_11_most_multiples_of_100_are_common_years
     assert_equal(`cal 1 1900`, `ruby cal.rb 1 1900`)
   end
 
-  def test_10_every_multiple_of_400_is_a_leap_year
+  def test_12_every_multiple_of_400_is_a_leap_year
     assert_equal(`cal 12 2000`, `ruby cal.rb 12 2000`)
   end
 
