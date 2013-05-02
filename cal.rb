@@ -134,12 +134,12 @@ class Cal
     month_line
   end # get_month_line method
 
-  def get_day_line first_index, last_index
+  def get_day_line
     day_line = ""
-    (first_index..last_index).each do | number |
+    3.times do | number |
       day_header = get_day_header
       day_line += day_header
-      day_line += "  " unless number == last_index
+      day_line += "  " unless number == 2
     end
     day_line
   end # get_day_line method
@@ -164,13 +164,12 @@ class Cal
   end # get_week_block method
 
   def format_year year
-    month_list = get_month_list
     year_header = get_year_header(year)
     formatted_year = "#{year_header}\n\n"
     (0..11).step(3) do | first_index |
       last_index = first_index + 2
       month_line = get_month_line(first_index, last_index)
-      day_line = get_day_line(first_index, last_index)
+      day_line = get_day_line
       week_block = get_week_block(first_index, last_index)
       formatted_year += "#{month_line}\n#{day_line}\n#{week_block}"
     end

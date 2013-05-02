@@ -75,38 +75,43 @@ class CalUnitTest < Test::Unit::TestCase
     assert_equal(2013, cal.year)
   end
 
-  def test_25_get_month_header_returns_centered_month_and_year
+  def test_25_get_year_header_returns_centered_year
+    cal = Cal.new("August", 2999)
+    assert_equal("                             2999", cal.get_year_header(2999))
+  end
+
+  def test_26_get_month_header_returns_centered_month_and_year
     even_spaces = Cal.new("May", 1966)
     odd_spaces = Cal.new("November", 1938)
     assert_equal("      May 1966", even_spaces.get_month_header("May", 1966))
     assert_equal("   November 1938", odd_spaces.get_month_header("November", 1938))
   end
 
-  def test_26_get_month_header_returns_centered_month_only
+  def test_27_get_month_header_returns_centered_month_only
     even_spaces = Cal.new(1804)
     assert_equal("       March", even_spaces.get_month_header("March"))
   end
 
-  def test_27_get_day_header_returns_days_of_week
+  def test_28_get_day_header_returns_days_of_week
     cal = Cal.new("June", 1844)
     assert_equal("Su Mo Tu We Th Fr Sa", cal.get_day_header)
   end
 
-  def test_28_get_first_day_returns_first_day_of_month
+  def test_29_get_first_day_returns_first_day_of_month
     common_year = Cal.new("May", 2501)
     leap_year = Cal.new("February", 1984)
     assert_equal("Sunday", common_year.get_first_day("May", 2501))
     assert_equal("Wednesday", leap_year.get_first_day("February", 1984))
   end
 
-  def test_29_get_first_day_index_returns_index_of_first_day_of_month
+  def test_30_get_first_day_index_returns_index_of_first_day_of_month
     common_year = Cal.new("August", 2109)
     leap_year = Cal.new("February", 2092)
     assert_equal(4, common_year.get_first_day_index("August", 2109))
     assert_equal(5, leap_year.get_first_day_index("February", 2092))
   end
 
-  def test_30_get_month_days_returns_number_of_days_in_month
+  def test_31_get_month_days_returns_number_of_days_in_month
     common_year_31 = Cal.new("January", 2779)
     common_year_30 = Cal.new("September", 2483)
     common_year_28 = Cal.new("February", 1811)
@@ -117,7 +122,17 @@ class CalUnitTest < Test::Unit::TestCase
     assert_equal(29, leap_year.get_month_days("February", 2072))
   end
 
-  def test_31_format_week_returns_five_formatted_weeks
+  def test_32_get_week_range_returns_date_range_for_week
+    cal = Cal.new("November", 1945)
+    assert_equal((1..3), cal.get_week_range(0, "November", 1945))
+    assert_equal((4..10), cal.get_week_range(1, "November", 1945))
+    assert_equal((11..17), cal.get_week_range(2, "November", 1945))
+    assert_equal((18..24), cal.get_week_range(3, "November", 1945))
+    assert_equal((25..30), cal.get_week_range(4, "November", 1945))
+    assert_equal((32..30), cal.get_week_range(5, "November", 1945))
+  end
+
+  def test_33_format_week_returns_five_formatted_weeks
     cal = Cal.new("April", 2003)
     assert_equal("       1  2  3  4  5", cal.format_week(0, "April", 2003))
     assert_equal(" 6  7  8  9 10 11 12", cal.format_week(1, "April", 2003))
@@ -127,7 +142,7 @@ class CalUnitTest < Test::Unit::TestCase
     assert_equal("", cal.format_week(5, "April", 2003))
   end
 
-  def test_32_format_week_returns_six_formatted_weeks
+  def test_34_format_week_returns_six_formatted_weeks
     cal = Cal.new("July", 2490)
     assert_equal("                   1", cal.format_week(0, "July", 2490))
     assert_equal(" 2  3  4  5  6  7  8", cal.format_week(1, "July", 2490))
@@ -137,12 +152,65 @@ class CalUnitTest < Test::Unit::TestCase
     assert_equal("30 31", cal.format_week(5, "July", 2490))
   end
 
-  def test_33_format_month_returns_formatted_month
+  def test_35_format_month_returns_formatted_month
     cal = Cal.new("August", 1979)
     assert_equal(`cal August 1979`, cal.format_month("August", 1979))
   end
 
-  def test_34_format_year_returns_formatted_year
+  def test_36_get_month_line_returns_month_line
+    cal = Cal.new("December", 2372)
+    assert_equal("      January               February               March", cal.get_month_line(0, 2))
+    assert_equal("       April                  May                   June", cal.get_month_line(3, 5))
+    assert_equal("        July                 August              September", cal.get_month_line(6, 8))
+    assert_equal("      October               November              December", cal.get_month_line(9, 11))
+  end
+
+  def test_37_get_day_line_returns_day_line
+    cal = Cal.new("April", 1872)
+    assert_equal("Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa", cal.get_day_line)
+  end
+
+  def test_38_get_week_block_returns_week_block
+    cal = Cal.new("March", 2601)
+    jan_feb_mar = <<BLOCK
+             1  2  3   1  2  3  4  5  6  7   1  2  3  4  5  6  7
+ 4  5  6  7  8  9 10   8  9 10 11 12 13 14   8  9 10 11 12 13 14
+11 12 13 14 15 16 17  15 16 17 18 19 20 21  15 16 17 18 19 20 21
+18 19 20 21 22 23 24  22 23 24 25 26 27 28  22 23 24 25 26 27 28
+25 26 27 28 29 30 31                        29 30 31
+                                            
+BLOCK
+    apr_may_june = <<BLOCK
+          1  2  3  4                  1  2      1  2  3  4  5  6
+ 5  6  7  8  9 10 11   3  4  5  6  7  8  9   7  8  9 10 11 12 13
+12 13 14 15 16 17 18  10 11 12 13 14 15 16  14 15 16 17 18 19 20
+19 20 21 22 23 24 25  17 18 19 20 21 22 23  21 22 23 24 25 26 27
+26 27 28 29 30        24 25 26 27 28 29 30  28 29 30
+                      31                    
+BLOCK
+    july_aug_sept = <<BLOCK
+          1  2  3  4                     1         1  2  3  4  5
+ 5  6  7  8  9 10 11   2  3  4  5  6  7  8   6  7  8  9 10 11 12
+12 13 14 15 16 17 18   9 10 11 12 13 14 15  13 14 15 16 17 18 19
+19 20 21 22 23 24 25  16 17 18 19 20 21 22  20 21 22 23 24 25 26
+26 27 28 29 30 31     23 24 25 26 27 28 29  27 28 29 30
+                      30 31                 
+BLOCK
+    oct_nov_dec = <<BLOCK
+             1  2  3   1  2  3  4  5  6  7         1  2  3  4  5
+ 4  5  6  7  8  9 10   8  9 10 11 12 13 14   6  7  8  9 10 11 12
+11 12 13 14 15 16 17  15 16 17 18 19 20 21  13 14 15 16 17 18 19
+18 19 20 21 22 23 24  22 23 24 25 26 27 28  20 21 22 23 24 25 26
+25 26 27 28 29 30 31  29 30                 27 28 29 30 31
+                                            
+BLOCK
+    assert_equal(jan_feb_mar, cal.get_week_block(0, 2))
+    assert_equal(apr_may_june, cal.get_week_block(3, 5))
+    assert_equal(july_aug_sept, cal.get_week_block(6, 8))
+    assert_equal(oct_nov_dec, cal.get_week_block(9, 11))
+  end
+
+  def test_39_format_year_returns_formatted_year
     cal = Cal.new(2755)
     assert_equal(`cal 2755`, cal.format_year(2755))
   end
