@@ -2,17 +2,11 @@ class Cal
   attr_reader :month
   attr_reader :year
 
-  def get_month_list get_first_day = false
+  def get_month_list get_first_day_index = false
     month_list = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    month_list = month_list.rotate!(2) if get_first_day
+    month_list = month_list.rotate!(2) if get_first_day_index
     month_list
   end # get_month_list method
-
-  def get_day_list get_first_day = false
-    day_list = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-    day_list = day_list.rotate!(-1) if get_first_day
-    day_list
-  end # get_day_list method
 
   def initialize month = nil, year = nil
     month_list = get_month_list
@@ -48,26 +42,18 @@ class Cal
     month_header = "#{month} #{year}"
     month_header = "#{month}" if year.nil?
     month_header.center(20).rstrip!
-  end #  month_head method
+  end # get_month_header method
 
   def get_day_header
     "Su Mo Tu We Th Fr Sa"
   end # get_day_header method
 
-  def get_first_day month, year
-    # See http://en.wikipedia.org/wiki/Zeller's_congruence for an explanation of Zeller's congruence.
-    day_list = get_day_list(true)
+  def get_first_day_index month, year
+    # See http://en.wikipedia.org/wiki/Zeller's_congruence for an explanation of Zeller's congruence. This implementation has been modified to begin the week on Sunday.
     month_list = get_month_list(true)
     m = month_list.index(month) + 3
     y = m > 12 ? year - 1 : year
-    day_index = (1 + (((m + 1) * 26) / 10).floor + y + (y / 4).floor + (6 * (y / 100).floor) + (y / 400).floor) % 7
-    day_list[day_index]
-  end # get_first_day_index method
-
-  def get_first_day_index month, year
-    day_list = get_day_list
-    first_day = get_first_day(month, year)
-    day_list.index(first_day)
+    day_index = ((((m + 1) * 26) / 10).floor + y + (y / 4).floor + (6 * (y / 100).floor) + (y / 400).floor) % 7
   end # get_first_day_index method
 
   def get_month_days month, year
@@ -189,7 +175,7 @@ class Cal
             format_month(@month, @year)
           end
     puts cal
-  end # print_cal method
+  end # render method
 
 end # Cal class
 
