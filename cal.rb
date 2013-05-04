@@ -179,10 +179,45 @@ class Cal
 
 end # Cal class
 
+class VertiCal < Cal
+
+  def get_first_day_index month, year
+    first_day_index = super - 1 == -1 ? 6 : super - 1
+  end # get_first_day_index method
+
+  def get_day_array
+    get_day_header.split.rotate!(1)
+  end # get_day_array method
+
+  def format_row row, month, year
+    day_array = get_day_array
+    formatted_row = "#{day_array[row]}"
+    (0..5).each do | week |
+      formatted_week = format_week(week, month, year)
+      formatted_row += " " unless formatted_week.length < row * 3 + 1
+      date = formatted_week.slice(row * 3, 2)
+      formatted_row += date unless date.nil?
+    end
+    formatted_row
+  end # format_row method
+
+  def format_month month, year
+    month_header = get_month_header(month, year).strip!
+    formatted_month = "    #{month_header}\n"
+    (0..6).each do | row |
+      formatted_row = format_row(row, month, year)
+      formatted_month += formatted_row + "\n"
+    end
+    formatted_month
+  end # format_month method
+
+end # VertiCal class
+
 # Executes program if called from the command line.
 if __FILE__ == $0
   cmd_month = ARGV[0]
   cmd_year = ARGV[1]
-  cal = Cal.new(cmd_month, cmd_year)
+  cmd_layout = ARGV[2]
+  cal = cmd_layout == "goofy" ? VertiCal.new(cmd_month, cmd_year) : Cal.new(cmd_month, cmd_year)
   cal.render
 end

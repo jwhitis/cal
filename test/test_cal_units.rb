@@ -202,4 +202,30 @@ BLOCK
     assert_equal(`cal 2755`, cal.format_year(2755))
   end
 
+  def test_38_get_first_day_index_returns_index_of_first_day_of_month
+    cal = VertiCal.new("June", 2020)
+    assert_equal(0, cal.get_first_day_index("June", 2020))
+  end
+
+  def test_39_get_day_array_returns_array_of_days
+    cal = VertiCal.new("December", 2867)
+    assert_equal(["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"], cal.get_day_array)
+  end
+
+  def test_40_format_row_returns_formatted_row
+    cal = VertiCal.new("January", 1891)
+    assert_equal("Mo     5 12 19 26", cal.format_row(0, "January", 1891))
+    assert_equal("Tu     6 13 20 27", cal.format_row(1, "January", 1891))
+    assert_equal("We     7 14 21 28", cal.format_row(2, "January", 1891))
+    assert_equal("Th  1  8 15 22 29", cal.format_row(3, "January", 1891))
+    assert_equal("Fr  2  9 16 23 30", cal.format_row(4, "January", 1891))
+    assert_equal("Sa  3 10 17 24 31", cal.format_row(5, "January", 1891))
+    assert_equal("Su  4 11 18 25", cal.format_row(6, "January", 1891))
+  end
+
+  def test_41_format_month_returns_formatted_month
+    cal = VertiCal.new("May", 2013)
+    assert_equal(`CAL March 2560`, cal.format_month("March", 2560))
+  end
+
 end
